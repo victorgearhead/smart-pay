@@ -18,7 +18,6 @@ pub mod smartpay_rewards {
         let mint = &mut ctx.accounts.mint;
         let rent = Rent::get()?;
         
-        // Initialize mint account
         token::initialize_mint(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -32,13 +31,12 @@ pub mod smartpay_rewards {
             freeze_authority.as_ref(),
         )?;
 
-        // Initialize program state
         let program_state = &mut ctx.accounts.program_state;
         program_state.mint = mint.key();
         program_state.mint_authority = mint_authority;
         program_state.total_minted = 0;
         program_state.total_transactions = 0;
-        program_state.reward_rate = 200; // 2% = 200 basis points
+        program_state.reward_rate = 200;
         program_state.admin = ctx.accounts.admin.key();
         program_state.bump = *ctx.bumps.get("program_state").unwrap();
 
@@ -53,20 +51,16 @@ pub mod smartpay_rewards {
     ) -> Result<()> {
         let program_state = &mut ctx.accounts.program_state;
         
-        // Validate transaction
         require!(amount > 0, ErrorCode::InvalidAmount);
         require!(transaction_id.len() <= 64, ErrorCode::TransactionIdTooLong);
         
-        // Check if transaction already processed
         let transaction_seed = format!("transaction_{}", transaction_id);
         let transaction_account = &ctx.accounts.transaction_record;
         require!(!transaction_account.is_processed, ErrorCode::TransactionAlreadyProcessed);
 
-        // Calculate reward amount (2% of transaction amount)
         let reward_amount = (amount * program_state.reward_rate as u64) / 10000;
         require!(reward_amount > 0, ErrorCode::RewardTooSmall);
 
-        // Mint tokens to user's associated token account
         let seeds = &[
             b"program_state",
             &[program_state.bump],
@@ -86,11 +80,9 @@ pub mod smartpay_rewards {
             reward_amount,
         )?;
 
-        // Update program state
         program_state.total_minted = program_state.total_minted.checked_add(reward_amount).unwrap();
         program_state.total_transactions = program_state.total_transactions.checked_add(1).unwrap();
 
-        // Mark transaction as processed
         let transaction_record = &mut ctx.accounts.transaction_record;
         transaction_record.transaction_id = transaction_id.clone();
         transaction_record.user = ctx.accounts.user.key();
@@ -99,7 +91,6 @@ pub mod smartpay_rewards {
         transaction_record.timestamp = Clock::get()?.unix_timestamp;
         transaction_record.is_processed = true;
 
-        // Create user reward account if first time
         let user_rewards = &mut ctx.accounts.user_rewards;
         if user_rewards.user == Pubkey::default() {
             user_rewards.user = ctx.accounts.user.key();
@@ -108,7 +99,6 @@ pub mod smartpay_rewards {
             user_rewards.transaction_count = 0;
         }
 
-        // Update user rewards
         user_rewards.total_earned = user_rewards.total_earned.checked_add(reward_amount).unwrap();
         user_rewards.transaction_count = user_rewards.transaction_count.checked_add(1).unwrap();
 
@@ -136,7 +126,6 @@ pub mod smartpay_rewards {
         
         require!(current_balance >= amount, ErrorCode::InsufficientBalance);
         
-        // Burn tokens from user account
         token::burn(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -149,7 +138,6 @@ pub mod smartpay_rewards {
             amount,
         )?;
 
-        // Update user rewards tracking
         user_rewards.total_redeemed = user_rewards.total_redeemed.checked_add(amount).unwrap();
 
         msg!("Redeemed {} SmartReward tokens", amount);
@@ -167,7 +155,7 @@ pub mod smartpay_rewards {
         ctx: Context<UpdateRewardRate>,
         new_rate: u16,
     ) -> Result<()> {
-        require!(new_rate <= 1000, ErrorCode::RewardRateTooHigh); // Max 10%
+        require!(new_rate <= 1000, ErrorCode::RewardRateTooHigh); 
         
         let program_state = &mut ctx.accounts.program_state;
         program_state.reward_rate = new_rate;

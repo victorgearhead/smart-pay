@@ -64,5 +64,4 @@ echo "✅ Anchor program deployment completed!"
 echo "🏆 SmartReward Token Program ID: $PROGRAM_ID"
 echo "🔗 Explorer: https://explorer.solana.com/address/$PROGRAM_ID?cluster=$SOLANA_CLUSTER"
 
-# Return to backend directory
 cd ..

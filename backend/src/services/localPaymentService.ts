@@ -31,9 +31,9 @@ export interface LocalPaymentResponse extends PaymentMockResponse {
 
 export class LocalPaymentService {
   private static gatewayEndpoints: Record<PaymentGateway, string> = {
-    stripe: process.env.STRIPE_MOCK_URL || 'http://localhost:8080/stripe',
-    amazonpay: process.env.AMAZON_PAY_MOCK_URL || 'http://localhost:8080/amazon-pay',
-    solana: process.env.SOLANA_MOCK_URL || 'http://localhost:8080/solana'
+    stripe: process.env.STRIPE_MOCK_URL || 'http://localhost:8085/stripe',
+    amazonpay: process.env.AMAZON_PAY_MOCK_URL || 'http://localhost:8085/amazon-pay',
+    solana: process.env.SOLANA_MOCK_URL || 'http://localhost:8085/solana'
   };
 
   static async processPayment(request: LocalPaymentRequest): Promise<LocalPaymentResponse> {
@@ -66,6 +66,8 @@ export class LocalPaymentService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+
+    console.log('Payment response status:', resp.status);
 
     if (!resp.ok) {
       timer.end();

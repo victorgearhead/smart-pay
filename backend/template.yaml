@@ -25,7 +25,6 @@ Globals:
       - !Ref CommonLayer
 
 Resources:
-  # Common Layer for shared dependencies
   CommonLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -35,7 +34,6 @@ Resources:
         - nodejs18.x
       RetentionPolicy: Delete
 
-  # API Gateway with enhanced security
   SmartPayApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -60,7 +58,6 @@ Resources:
           BurstLimit: 100
           RateLimit: 50
 
-  # WebSocket API for real-time events
   WebSocketApi:
     Type: AWS::ApiGatewayV2::Api
     Properties:
@@ -89,7 +86,6 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebSocketHandler.Arn}/invocations
 
-  # Cognito with enhanced security
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -118,7 +114,6 @@ Resources:
         - USER_PASSWORD_AUTH
       PreventUserExistenceErrors: ENABLED
 
-  # ElastiCache Redis for caching
   ElastiCacheSubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
     Properties:
@@ -140,7 +135,6 @@ Resources:
       TransitEncryptionEnabled: true
       AtRestEncryptionEnabled: true
 
-  # VPC for secure networking
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -179,7 +173,6 @@ Resources:
       GroupDescription: Security group for Lambda functions
       VpcId: !Ref VPC
 
-  # Lambda Functions with enhanced monitoring
   FraudFunction:
     Type: AWS::Serverless::Function
     Properties:

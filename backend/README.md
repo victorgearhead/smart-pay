@@ -38,17 +38,14 @@ A comprehensive payment orchestration platform with AI-powered fraud detection, 
 
 ### Environment Variables
 ```bash
-# AWS Configuration
 AWS_REGION=us-east-1
 FRAUD_ENDPOINT_NAME=fraud-detection-endpoint
 ROUTING_ENDPOINT_NAME=routing-bandit-endpoint
 
-# External Services
 STRIPE_SECRET_KEY=sk_test_...
 OPENAI_API_KEY=sk-...
 OPENSEARCH_ENDPOINT=https://search-...
 
-# Solana Configuration
 SOLANA_RPC_URL=https://api.devnet.solana.com
 SPL_TOKEN_MINT_ADDRESS=...
 MINT_AUTHORITY_SECRET_KEY=...
@@ -58,34 +55,25 @@ SOLANA_TREASURY_WALLET=...
 
 ### Local Development
 ```bash
-# Install dependencies
 npm install
 
-# Run tests
 npm test
 
-# Build TypeScript
 npm run build
 
-# Start local API
 sam local start-api --port 3001
 
-# Deploy to AWS
 sam build && sam deploy --guided
 ```
 
 ### Testing
 ```bash
-# Unit tests
 npm test
 
-# Integration tests
 npm run test:integration
 
-# Load testing
 npm run test:load
 
-# Coverage report
 npm run test:coverage
 ```
 
@@ -184,11 +172,9 @@ backend/
 
 ### Debug Mode
 ```bash
-# Enable detailed logging
 export DEBUG=smartpay:*
 export LOG_LEVEL=debug
 
-# Check CloudWatch logs
 aws logs tail /aws/lambda/smartpay-fraud-function --follow
 ```
 

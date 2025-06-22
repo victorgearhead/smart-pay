@@ -63,7 +63,7 @@ services:
     networks:
       - smartpay-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f https://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -74,7 +74,7 @@ services:
     ports:
       - "5601:5601"
     environment:
-      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
       SERVER_HOST: "0.0.0.0"
     depends_on:
@@ -113,7 +113,7 @@ services:
     networks:
       - smartpay-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 15s
       timeout: 5s
       retries: 3

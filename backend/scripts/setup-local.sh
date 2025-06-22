@@ -1,23 +1,17 @@
-
-#!/bin/bash
-
 set -e
 
 echo "🚀 Setting up SmartPay Orchestrator for Local Development"
 
-# Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
     echo "❌ Docker is not running. Please start Docker and try again."
     exit 1
 fi
 
-# Check if Docker Compose is available
 if ! command -v docker-compose &> /dev/null; then
     echo "❌ Docker Compose is not installed. Please install Docker Compose and try again."
     exit 1
 fi
 
-# Copy environment file
 if [ ! -f .env.local ]; then
     echo "📄 Copying local environment configuration..."
     cp .env.local .env
@@ -25,19 +19,15 @@ else
     echo "📄 Using existing .env file"
 fi
 
-# Install Node.js dependencies
 echo "📦 Installing Node.js dependencies..."
 npm install
 
-# Start infrastructure services
 echo "🐳 Starting Docker infrastructure services..."
 docker-compose up -d
 
-# Wait for services to be ready
 echo "⏳ Waiting for services to be ready..."
 sleep 10
 
-# Check if LocalStack is ready
 echo "🔍 Checking LocalStack status..."
 until curl -s http://localhost:4566/health > /dev/null; do
     echo "Waiting for LocalStack..."
@@ -45,7 +35,6 @@ until curl -s http://localhost:4566/health > /dev/null; do
 done
 echo "✅ LocalStack is ready"
 
-# Check if Redis is ready
 echo "🔍 Checking Redis status..."
 until docker exec redis-smartpay redis-cli ping > /dev/null 2>&1; do
     echo "Waiting for Redis..."
@@ -53,7 +42,6 @@ until docker exec redis-smartpay redis-cli ping > /dev/null 2>&1; do
 done
 echo "✅ Redis is ready"
 
-# Check if OpenSearch is ready
 echo "🔍 Checking OpenSearch status..."
 until curl -s http://localhost:9200/_cluster/health > /dev/null; do
     echo "Waiting for OpenSearch..."
@@ -61,7 +49,6 @@ until curl -s http://localhost:9200/_cluster/health > /dev/null; do
 done
 echo "✅ OpenSearch is ready"
 
-# Build TypeScript
 echo "🔨 Building TypeScript..."
 npm run build
 

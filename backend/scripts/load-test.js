@@ -2,7 +2,6 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-// Artillery.js load test configuration
 const artilleryConfig = {
   config: {
     target: process.env.API_ENDPOINT || 'https://api.smartpay.dev',
@@ -110,7 +109,6 @@ const artilleryConfig = {
   ]
 };
 
-// Write Artillery config file
 fs.writeFileSync('load-test.yml', `# Artillery Load Test Configuration
 ${JSON.stringify(artilleryConfig, null, 2).replace(/"/g, '').replace(/,/g, '')}
 `);
@@ -121,12 +119,10 @@ console.log('Total duration: ~8 minutes');
 console.log('Peak rate: 50 requests/second');
 
 try {
-  // Run Artillery load test
   execSync('npx artillery run load-test.yml --output load-test-report.json', { 
     stdio: 'inherit' 
   });
   
-  // Generate HTML report
   execSync('npx artillery report load-test-report.json --output load-test-report.html', { 
     stdio: 'inherit' 
   });

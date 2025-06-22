@@ -1,13 +1,9 @@
-
-#!/bin/bash
-
 set -e
 
 BASE_URL="http://localhost:3001"
 
 echo "🧪 Testing SmartPay Orchestrator APIs"
 
-# Test health endpoint
 echo "🔍 Testing health endpoint..."
 curl -X GET "$BASE_URL/health" | jq '.'
 

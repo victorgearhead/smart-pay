@@ -1,5 +1,8 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
+import { v4 as uuidv4 } from 'uuid';
+
+const HEADER_REQUEST_ID = 'x-request-id';
 
 export interface LogContext {
   transactionId?: string;
@@ -15,6 +18,8 @@ class Logger {
   setContext(context: LogContext) {
     this.context = { ...this.context, ...context };
   }
+
+
 
   private formatLog(level: string, message: string, meta?: any) {
     return JSON.stringify({
@@ -49,15 +54,16 @@ class Logger {
     }
   }
 
+  
   static extractContext(event: APIGatewayProxyEvent): LogContext {
+    console.log(event);
     const body = event.body ? JSON.parse(event.body) : {};
-    
+
     return {
       transactionId: body.transactionId,
       userId: body.userId,
-      correlationId: event.headers['x-correlation-id'] || 
-                    event.requestContext.requestId,
-      requestId: event.requestContext.requestId,
+      correlationId: event.headers['x-correlation-id'],
+      requestId: uuidv4(),
       functionName: process.env.AWS_LAMBDA_FUNCTION_NAME
     };
   }
@@ -74,12 +80,23 @@ class Logger {
   }
 
   logRequest(event: APIGatewayProxyEvent) {
-    this.info('Incoming request', {
-      httpMethod: event.httpMethod,
-      path: event.path,
-      userAgent: event.headers['User-Agent'],
-      sourceIp: event.requestContext.identity.sourceIp
-    });
+    const httpMethod = event.httpMethod;
+    const path       = event.path;
+
+    // User‐Agent header may be lowercase in practice
+    const userAgent = event.headers['user-agent'] || event.headers['User-Agent'] || 'UNKNOWN';
+
+    // Try true Lambda sourceIp, else fall back to X-Forwarded-For or UNKNOWN
+    const sourceIp =
+      // Lambda proxy v1
+      event.requestContext?.identity?.sourceIp
+      // Lambda proxy v2
+      || (event.requestContext as any)?.http?.sourceIp
+      // Typical HTTP header when sitting behind a proxy
+      || (event.headers['x-forwarded-for']?.split(',')[0])
+      || 'UNKNOWN';
+
+    this.info('Incoming request', { httpMethod, path, userAgent, sourceIp });
   }
 
   logResponse(statusCode: number, responseTime?: number) {

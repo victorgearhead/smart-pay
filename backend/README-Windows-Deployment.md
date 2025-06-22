@@ -13,32 +13,24 @@
 ### 1. Setup and Start Services (Windows)
 
 ```powershell
-# Clone and navigate to backend
 cd backend
 
-# Run the Windows setup script
 .\scripts\setup-windows.bat
 ```
 
 ### 2. Manual Setup (if script fails)
 
 ```powershell
-# Copy environment file
 copy .env.local .env
 
-# Install dependencies
 npm install
 
-# Start Docker services
 docker-compose up -d
 
-# Wait for services (check manually)
 docker-compose ps
 
-# Build TypeScript
 npm run build
 
-# Start the server
 npm run dev
 ```
 
@@ -47,19 +39,16 @@ npm run dev
 Edit `.env` file and add your API keys:
 
 ```bash
-# Required for real payment processing
 STRIPE_SECRET_KEY=sk_test_YOUR_STRIPE_TEST_KEY
 OPENAI_API_KEY=sk-YOUR_OPENAI_API_KEY
 
-# Required for Solana rewards (generate with solana-keygen)
-MINT_AUTHORITY_SECRET_KEY=[1,2,3,4,5...] # Your keypair array
-SOLANA_PAYER_SECRET_KEY=[1,2,3,4,5...]   # Your keypair array
+MINT_AUTHORITY_SECRET_KEY=[1,2,3,4,5...]
+SOLANA_PAYER_SECRET_KEY=[1,2,3,4,5...]
 ```
 
 ### 4. Test the APIs (Windows)
 
 ```powershell
-# Test all endpoints using Windows batch script
 .\scripts\test-apis.bat
 ```
 
@@ -100,7 +89,6 @@ The RAG system is fully integrated and works with:
 
 ### Testing RAG:
 ```powershell
-# Test the AI assistant endpoint
 curl -X POST http://localhost:3001/api/chat ^
   -H "Content-Type: application/json" ^
   -H "Authorization: Bearer mock-jwt-token" ^
@@ -111,8 +99,6 @@ curl -X POST http://localhost:3001/api/chat ^
 
 ### Docker Desktop Issues:
 ```powershell
-# Restart Docker Desktop
-# Or via command line:
 & "C:\Program Files\Docker\Docker\Docker Desktop.exe" --quit
 Start-Sleep -Seconds 5
 & "C:\Program Files\Docker\Docker\Docker Desktop.exe"
@@ -120,29 +106,24 @@ Start-Sleep -Seconds 5
 
 ### Port Conflicts (Windows):
 ```powershell
-# Find processes using ports
 netstat -ano | findstr "3001"
 netstat -ano | findstr "4566"
 netstat -ano | findstr "6379"
 netstat -ano | findstr "9200"
 
-# Kill process by PID (replace XXXX with actual PID)
 taskkill /PID XXXX /F
 ```
 
 ### WSL2 Issues:
 ```powershell
-# Check WSL2 status
 wsl --status
 
-# Restart WSL2 if needed
 wsl --shutdown
 wsl
 ```
 
 ### Reset Everything (Windows):
 ```powershell
-# Stop and remove all containers and volumes
 docker-compose down -v
 docker system prune -f
 .\scripts\setup-windows.bat
@@ -150,7 +131,6 @@ docker system prune -f
 
 ### Environment Variable Issues:
 ```powershell
-# Check if environment variables are loaded
 Get-Content .env
 ```
 
@@ -163,28 +143,22 @@ curl http://localhost:3001/health
 
 ### 2. Infrastructure Check:
 ```powershell
-# Redis
 docker exec redis-smartpay redis-cli ping
 
-# OpenSearch
 curl http://localhost:9200/_cluster/health
 
-# LocalStack
 curl http://localhost:4566/health
 ```
 
 ### 3. API Testing:
 ```powershell
-# Run all tests
 .\scripts\test-apis.bat
 ```
 
 ### 4. RAG Testing:
 ```powershell
-# Check OpenSearch indices
 curl http://localhost:9200/_cat/indices
 
-# Test knowledge search
 curl -X POST http://localhost:9200/smartpay-knowledge/_search ^
   -H "Content-Type: application/json" ^
   -d "{\"query\":{\"match_all\":{}}}"
@@ -194,19 +168,18 @@ curl -X POST http://localhost:9200/smartpay-knowledge/_search ^
 
 ### Start Frontend:
 ```powershell
-# In project root directory
 npm install
 npm run dev
 ```
 
 ### Access Application:
-- **Frontend**: `http://localhost:8080` (or your Vite port)
-- **Backend**: `http://localhost:3001`
+- **Frontend**: `http://localhost:3001` (or your Vite port)
+- **Backend**: `http://localhost:8080`
 
 ## 🚀 Production Deployment Notes
 
 ### What Works Locally:
-✅ **Mock ML Models** - XGBoost, Vowpal Wabbit, GNN, Anomaly Detection  
+✅ **Mock ML Models** - XGBoost, Vowpal Wabbit
 ✅ **Mock Payment Gateways** - Stripe, Amazon Pay, Solana  
 ✅ **RAG System** - OpenSearch + OpenAI integration  
 ✅ **Real-time Updates** - WebSocket connections  
@@ -223,15 +196,12 @@ npm run dev
 
 ### Logs and Monitoring:
 ```powershell
-# Backend logs
 npm run dev
 
-# Docker service logs
 docker-compose logs redis
 docker-compose logs opensearch
 docker-compose logs localstack
 
-# Check all services
 docker-compose ps
 ```
 

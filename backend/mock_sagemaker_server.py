@@ -5,7 +5,6 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Health Check
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({
@@ -13,11 +12,9 @@ def health():
         'timestamp': datetime.utcnow().isoformat()
     })
 
-# Fraud Detection - XGBoost Mock
 @app.route('/fraud-xgboost-endpoint-local/invocations', methods=['POST'])
 def fraud_xgboost():
     data = request.get_json(force=True)
-    # Simulate latency
     time.sleep(0.1 + random.random() * 0.2)
     instances = data.get('instances', [data])
     predictions = []
@@ -29,19 +26,17 @@ def fraud_xgboost():
         predictions.append({'score': round(score, 4)})
     return jsonify({'predictions': predictions})
 
-# Routing - Vowpal Wabbit Bandit Mock
 @app.route('/routing-vw-bandit-endpoint-local/invocations', methods=['POST'])
 def routing_vw():
     data = request.get_json(force=True)
     time.sleep(0.05 + random.random() * 0.1)
-    # Simple rule: low amount->solana, high risk->stripe, else random
     ctx = data.get('context_features', {})
     amt_log = ctx.get('amount_log', 5)
     risk = ctx.get('risk_score', 0)
     if amt_log < 4:
-        action = 2  # solana
+        action = 2 
     elif risk > 0.5:
-        action = 0  # stripe
+        action = 0 
     else:
         action = random.choice([0,1,2])
     prob = round(0.7 + random.uniform(0,0.2), 4)

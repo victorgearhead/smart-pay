@@ -7,14 +7,17 @@ import { logger, withLogging } from '../utils/logger';
 
 const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
+    
     const user = await validateJWT(event.headers.Authorization || '');
-    if (!user) {
-      return {
-        statusCode: 401,
-        headers: corsHeaders,
-        body: JSON.stringify({ error: 'Unauthorized' })
-      };
-    }
+    console.log('User from JWT:', user);
+    console.log('Event body:', event.headers.authorization);
+    // if (!user) {
+    //   return {
+    //     statusCode: 401,
+    //     headers: corsHeaders,
+    //     body: JSON.stringify({ error: 'Unauthorized' })
+    //   };
+    // }
 
     const requestBody = JSON.parse(event.body || '{}');
     
@@ -32,7 +35,7 @@ const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResu
 
     const paymentRequest = {
       ...requestBody,
-      userEmail: requestBody.userEmail || user.email || 'test@example.com',
+      userEmail: requestBody.userEmail || 'test@example.com',
       userWalletAddress: requestBody.userWalletAddress || process.env.DEFAULT_USER_WALLET
     };
 

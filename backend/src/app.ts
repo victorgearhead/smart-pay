@@ -6,13 +6,12 @@ import { paymentHandler } from './handlers/paymentHandler';
 import { fraudHandler } from './handlers/fraudHandler';
 // import { rewardHandler } from './handlers/rewardHandler';
 import { logger } from './utils/logger';
+import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: 'http://localhost:8081',
-  credentials: true
 }));
 app.use(
   helmet({
@@ -27,11 +26,9 @@ app.use(
 app.use(express.json());
 
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`, {
-    body: req.body,
-    query: req.query,
-    headers: req.headers
-  });
+  if (!req.headers['x-request-id']) {
+    req.headers['x-request-id'] = uuidv4();
+  }
   next();
 });
 
@@ -45,13 +42,14 @@ app.get('/health', (req, res) => {
 
 app.post('/api/payment', async (req, res) => {
   try {
-    const event = {
-      body: JSON.stringify(req.body),
-      headers: req.headers
-    };
-    const result = await paymentHandler(event as any, {} as any);
+    console.log('hiii');
+    const event = { body: JSON.stringify(req.body), headers: req.headers, method: req.method, path: req.path };
+    const context = { requestContext: { requestId: req.headers['x-request-id'] || uuidv4() } };
+    const result = await paymentHandler(event as any, context as any);
     res.status(result.statusCode).json(JSON.parse(result.body));
+
   } catch (error) {
+    console.log(error)
     logger.error('Payment API error', error);
     res.status(500).json({ error: 'Internal server error' });
   }

@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import logging
-# from sklearn.preprocessing import StandardScaler
 from vowpal_wabbit_model import RoutingContextualBandit
 
 logging.basicConfig(level=logging.INFO)
@@ -15,23 +14,18 @@ def safe_float(x, default=0.0):
         return default
 
 def main():
-    # 1) Load your CSV
     csv_path = "routing_synthetic.csv"
     logger.info(f"Loading dataset from {csv_path}…")
     df = pd.read_csv(csv_path)
     logger.info(f"→ {len(df)} rows loaded")
 
-    # 2) Normalize numeric context features
     ctx_feats = ['amount_log', 'risk_score', 'hour', 'day_of_week']
-    # scaler = StandardScaler()
-    # df[ctx_feats] = scaler.fit_transform(df[ctx_feats])
     df['is_weekend'] = df['is_weekend'].astype(int)
     logger.info("Context features normalized")
 
-    # 3) Build training examples
     training_data = []
     for idx, row in df.iterrows():
-        # Context
+        
         context = {
             'amount_log':   safe_float(row['amount_log']),
             'risk_score':   safe_float(row['risk_score']),
@@ -43,7 +37,6 @@ def main():
             'currency_code': safe_float(row['currency_code'])
         }
 
-        # Actions (3 of them)
         actions = []
         for i in range(3):
             actions.append({
@@ -65,13 +58,11 @@ def main():
             'reward': reward
         })
 
-    # 4) Train
     bandit = RoutingContextualBandit()
     bandit.initialize_model(learning_rate=0.1, epsilon=0.1)
     logger.info(f"Starting batch training on {len(training_data)} examples…")
     bandit.batch_train(training_data)
 
-    # 5) Save
     model_path = "routing_model.vw"
     bandit.save_model(model_path)
     logger.info(f"Model written to {model_path}")
