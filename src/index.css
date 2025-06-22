@@ -1,0 +1,236 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Amazon Dark Theme Color Palette */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 36 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 36 100% 95%;
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 36 100% 96%;
+    --muted-foreground: 0 0% 35%;
+
+    --accent: 36 100% 95%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 36 32% 91%;
+    --input: 36 32% 91%;
+    --ring: 36 100% 50%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 36 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 36 100% 95%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 36 13% 91%;
+    --sidebar-ring: 36 100% 50%;
+  }
+
+  .dark {
+    /* Amazon Dark Theme Base Colors */
+    --background: 207 23% 12%; /* #131921 */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+
+    --card: 210 19% 19%; /* #232f3e */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 210 19% 19%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 36 100% 50%; /* #FF9900 */
+    --primary-foreground: 207 23% 12%;
+
+    --secondary: 210 19% 19%; /* #232f3e */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 19% 12%; /* #1f2a37 */
+    --muted-foreground: 0 0% 80%; /* #CCCCCC */
+
+    --accent: 210 19% 19%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 52%; /* #D32F2F */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 16% 22%; /* #374151 */
+    --input: 210 19% 12%; /* #1f2a37 */
+    --ring: 36 100% 50%;
+    
+    --sidebar-background: 210 19% 19%; /* #232f3e */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 36 100% 50%;
+    --sidebar-primary-foreground: 207 23% 12%;
+    --sidebar-accent: 210 19% 19%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 16% 22%;
+    --sidebar-ring: 36 100% 50%;
+
+    /* Amazon specific colors */
+    --amazon-primary: 207 23% 12%; /* #131921 */
+    --amazon-secondary: 210 19% 19%; /* #232f3e */
+    --amazon-surface: 210 19% 12%; /* #1f2a37 */
+    --amazon-orange: 36 100% 50%; /* #FF9900 */
+    --amazon-orange-hover: 36 100% 63%; /* #ffb84d */
+    --amazon-blue: 211 71% 35%; /* #146EB4 */
+    --amazon-success: 123 39% 33%; /* #2E7D32 */
+    --amazon-success-light: 123 39% 35%; /* #388E3C */
+    --amazon-error: 4 74% 51%; /* #D32F2F */
+    --amazon-warning: 33 100% 48%; /* #F57C00 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Dark theme by default */
+  html {
+    @apply dark;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.4s ease-out;
+  }
+  
+  .animate-count-up {
+    animation: count-up 1s ease-out;
+  }
+
+  /* Amazon-specific utility classes */
+  .bg-amazon-primary {
+    background-color: #131921;
+  }
+  
+  .bg-amazon-secondary {
+    background-color: #232f3e;
+  }
+  
+  .bg-amazon-surface {
+    background-color: #1f2a37;
+  }
+  
+  .bg-amazon-orange {
+    background-color: #FF9900;
+  }
+  
+  .bg-amazon-orange-hover {
+    background-color: #ffb84d;
+  }
+  
+  .text-amazon-orange {
+    color: #FF9900;
+  }
+  
+  .text-amazon-blue {
+    color: #146EB4;
+  }
+  
+  .text-amazon-white {
+    color: #FFFFFF;
+  }
+  
+  .text-amazon-gray {
+    color: #CCCCCC;
+  }
+  
+  .border-amazon-border {
+    border-color: #374151;
+  }
+  
+  .border-amazon-orange {
+    border-color: #FF9900;
+  }
+
+  /* Amazon card hover effect */
+  .amazon-card-hover {
+    @apply transition-all duration-300 hover:-translate-y-0.5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .amazon-card-hover:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Amazon button styles */
+  .amazon-button {
+    @apply bg-amazon-orange hover:bg-amazon-orange-hover text-amazon-primary font-medium rounded transition-all duration-200;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .amazon-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.3);
+  }
+
+  /* Amazon input styles */
+  .amazon-input {
+    @apply bg-amazon-surface border-amazon-border text-amazon-white placeholder-amazon-gray rounded transition-colors duration-200;
+  }
+
+  .amazon-input:focus {
+    @apply border-amazon-orange outline-none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes count-up {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}

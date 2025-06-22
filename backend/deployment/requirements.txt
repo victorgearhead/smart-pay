@@ -1,0 +1,38 @@
+
+# Core ML libraries
+xgboost==1.7.6
+scikit-learn==1.3.0
+pandas==2.0.3
+numpy==1.24.3
+joblib==1.3.2
+
+# Deep learning for GNN
+torch==2.0.1
+torch-geometric==2.3.1
+torch-scatter==2.1.1
+torch-sparse==0.6.17
+
+# Anomaly detection
+pyod==1.1.0
+
+# Contextual bandit
+vowpalwabbit==9.8.0
+
+# Web framework
+flask==2.3.2
+gunicorn==21.2.0
+
+# AWS integrations
+boto3==1.28.25
+sagemaker==2.175.0
+
+# OpenSearch for RAG
+opensearch-py==2.3.1
+
+# OpenAI for chat
+openai==0.28.0
+
+# Additional utilities
+requests==2.31.0
+python-dateutil==2.8.2
+pytz==2023.3

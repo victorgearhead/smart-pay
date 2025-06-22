@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: localstack-smartpay
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=lambda,apigateway,s3,dynamodb,eventbridge
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_EXECUTOR=local
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - smartpay-network
+
+  redis:
+    container_name: redis-smartpay
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --bind 0.0.0.0
+    volumes:
+      - redis_data:/data
+    networks:
+      - smartpay-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  opensearch:
+    container_name: opensearch-smartpay
+    image: opensearchproject/opensearch:latest
+    environment:
+      - cluster.name=smartpay-cluster
+      - node.name=smartpay-node
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - "network.host=0.0.0.0"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    networks:
+      - smartpay-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f https://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  opensearch-dashboards:
+    container_name: opensearch-dashboards-smartpay
+    image: opensearchproject/opensearch-dashboards:latest
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+      SERVER_HOST: "0.0.0.0"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    networks:
+      - smartpay-network
+
+  ollama:
+    container_name: ollama-smartpay
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - smartpay-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mock-sagemaker:
+    container_name: mock-sagemaker-smartpay
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.9-slim
+        COPY mock_sagemaker_server.py .
+        RUN pip install flask
+        EXPOSE 8080
+        CMD ["python", "mock_sagemaker_server.py"]
+    ports:
+      - "8080:8080"
+    networks:
+      - smartpay-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  redis_data:
+    driver: local
+  opensearch_data:
+    driver: local
+  ollama_data:
+    driver: local
+
+networks:
+  smartpay-network:
+    driver: bridge

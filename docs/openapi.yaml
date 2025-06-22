@@ -1,0 +1,519 @@
+
+openapi: 3.0.3
+info:
+  title: SmartPay Orchestrator API
+  description: AI-powered payment orchestration platform with fraud detection, smart routing, and blockchain rewards
+  version: 1.0.0
+  contact:
+    name: SmartPay Team
+    email: support@smartpay.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.smartpay.com/dev
+    description: Development server
+  - url: https://api.smartpay.com/staging
+    description: Staging server
+  - url: https://api.smartpay.com/prod
+    description: Production server
+
+security:
+  - CognitoAuth: []
+
+paths:
+  /fraud:
+    post:
+      summary: Analyze transaction fraud risk
+      description: Uses ML models to assess the fraud risk of a transaction
+      tags:
+        - Fraud Detection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FraudRequest'
+            examples:
+              low_risk:
+                summary: Low risk transaction
+                value:
+                  transactionId: "tx1001"
+                  userId: "user_123"
+                  cardId: "card_abc"
+                  amount: 45.20
+                  currency: "USD"
+                  merchantId: "m_001"
+                  deviceId: "device_XYZ"
+                  ipAddress: "203.0.113.5"
+                  location: "New York, USA"
+                  timestamp: "2025-06-14T10:05:00Z"
+                  previousDeclines: 0
+                  velocityLastHour: 2
+              high_risk:
+                summary: High risk transaction
+                value:
+                  transactionId: "tx1002"
+                  userId: "user_456"
+                  cardId: "card_def"
+                  amount: 15000.00
+                  currency: "USD"
+                  merchantId: "m_004"
+                  deviceId: "device_ABC"
+                  ipAddress: "198.51.100.23"
+                  location: "Los Angeles, USA"
+                  timestamp: "2025-06-14T12:45:00Z"
+                  previousDeclines: 5
+                  velocityLastHour: 15
+      responses:
+        '200':
+          description: Risk assessment completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FraudResponse'
+              examples:
+                low_risk:
+                  summary: Low risk result
+                  value:
+                    transactionId: "tx1001"
+                    riskScore: 0.15
+                    recommendation: "APPROVE"
+                    factors: ["low_amount", "good_history"]
+                high_risk:
+                  summary: High risk result
+                  value:
+                    transactionId: "tx1002"
+                    riskScore: 0.87
+                    recommendation: "REVIEW"
+                    factors: ["high_amount", "multiple_declines", "high_velocity"]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /route:
+    post:
+      summary: Get optimal payment gateway
+      description: Uses contextual bandit algorithm to select the best payment gateway
+      tags:
+        - Smart Routing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutingRequest'
+            examples:
+              standard:
+                summary: Standard routing request
+                value:
+                  amount: 1200.00
+                  currency: "USD"
+                  riskScore: 0.23
+                  merchantType: "retail"
+                  region: "North America"
+      responses:
+        '200':
+          description: Optimal gateway selected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutingResponse'
+              examples:
+                stripe_selected:
+                  summary: Stripe selected
+                  value:
+                    gateway: "Stripe"
+                    confidence: 0.85
+                    reasoning: "Best success rate for this transaction profile"
+                    alternatives:
+                      - gateway: "AmazonPay"
+                        score: 0.72
+                      - gateway: "Solana"
+                        score: 0.45
+
+  /pay:
+    post:
+      summary: Process payment transaction
+      description: End-to-end payment processing with fraud detection and smart routing
+      tags:
+        - Payment Processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '402':
+          description: Payment declined
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentDeclined'
+
+  /reward:
+    post:
+      summary: Mint reward tokens
+      description: Mint SPL tokens on Solana as transaction rewards
+      tags:
+        - Rewards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardRequest'
+      responses:
+        '200':
+          description: Tokens minted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardResponse'
+
+  /chat:
+    post:
+      summary: AI assistant chat
+      description: Conversational AI with RAG-powered knowledge retrieval
+      tags:
+        - AI Assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            examples:
+              transaction_query:
+                summary: Transaction question
+                value:
+                  userId: "user_456"
+                  query: "Why did tx1002 fail?"
+                  sessionId: "session_123"
+              general_query:
+                summary: General question
+                value:
+                  userId: "user_789"
+                  query: "How do I connect my Phantom wallet?"
+                  sessionId: "session_456"
+      responses:
+        '200':
+          description: AI response generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+
+components:
+  securitySchemes:
+    CognitoAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    FraudRequest:
+      type: object
+      required:
+        - transactionId
+        - userId
+        - cardId
+        - amount
+        - currency
+        - merchantId
+        - deviceId
+        - ipAddress
+        - location
+        - timestamp
+        - previousDeclines
+        - velocityLastHour
+      properties:
+        transactionId:
+          type: string
+          description: Unique transaction identifier
+        userId:
+          type: string
+          description: User identifier
+        cardId:
+          type: string
+          description: Payment card identifier
+        amount:
+          type: number
+          minimum: 0
+          description: Transaction amount
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CAD]
+          description: Transaction currency
+        merchantId:
+          type: string
+          description: Merchant identifier
+        deviceId:
+          type: string
+          description: Device identifier
+        ipAddress:
+          type: string
+          format: ipv4
+          description: User IP address
+        location:
+          type: string
+          description: Transaction location
+        timestamp:
+          type: string
+          format: date-time
+          description: Transaction timestamp
+        previousDeclines:
+          type: integer
+          minimum: 0
+          description: Number of previous declines
+        velocityLastHour:
+          type: integer
+          minimum: 0
+          description: Transactions in last hour
+
+    FraudResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        riskScore:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Risk score between 0 (safe) and 1 (risky)
+        recommendation:
+          type: string
+          enum: [APPROVE, REVIEW, DECLINE]
+        factors:
+          type: array
+          items:
+            type: string
+          description: Risk factors identified
+        processingTime:
+          type: number
+          description: Processing time in milliseconds
+
+    RoutingRequest:
+      type: object
+      required:
+        - amount
+        - currency
+        - riskScore
+        - merchantType
+        - region
+      properties:
+        amount:
+          type: number
+          minimum: 0
+        currency:
+          type: string
+          enum: [USD, EUR, GBP, CAD]
+        riskScore:
+          type: number
+          minimum: 0
+          maximum: 1
+        merchantType:
+          type: string
+          enum: [retail, subscription, gaming, travel, luxury_goods]
+        region:
+          type: string
+          enum: [North America, Europe, Asia Pacific, Global]
+
+    RoutingResponse:
+      type: object
+      properties:
+        gateway:
+          type: string
+          enum: [Stripe, AmazonPay, Solana]
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        reasoning:
+          type: string
+        alternatives:
+          type: array
+          items:
+            type: object
+            properties:
+              gateway:
+                type: string
+              score:
+                type: number
+
+    PaymentRequest:
+      allOf:
+        - $ref: '#/components/schemas/FraudRequest'
+        - type: object
+          properties:
+            paymentMethod:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [card, wallet, crypto]
+                details:
+                  type: object
+
+    PaymentResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+          enum: [success, pending, failed]
+        gateway:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        riskScore:
+          type: number
+        processingTime:
+          type: number
+        rewardTokens:
+          type: number
+          description: Tokens minted as reward
+
+    PaymentDeclined:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+          enum: [declined]
+        reason:
+          type: string
+        riskScore:
+          type: number
+        suggestedActions:
+          type: array
+          items:
+            type: string
+
+    RewardRequest:
+      type: object
+      required:
+        - transactionId
+        - userId
+        - amount
+      properties:
+        transactionId:
+          type: string
+        userId:
+          type: string
+        amount:
+          type: number
+          description: Transaction amount to calculate rewards
+        walletAddress:
+          type: string
+          description: User's Solana wallet address
+
+    RewardResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        rewardToken:
+          type: string
+          enum: [SMART]
+        amountMinted:
+          type: number
+        walletAddress:
+          type: string
+        txSignature:
+          type: string
+          description: Solana transaction signature
+
+    ChatRequest:
+      type: object
+      required:
+        - userId
+        - query
+      properties:
+        userId:
+          type: string
+        query:
+          type: string
+          maxLength: 500
+        sessionId:
+          type: string
+          description: Optional session identifier for context
+
+    ChatResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        sources:
+          type: array
+          items:
+            type: string
+          description: Knowledge sources used
+        sessionId:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Fraud Detection
+    description: ML-powered fraud detection and risk assessment
+  - name: Smart Routing
+    description: Contextual bandit payment gateway optimization
+  - name: Payment Processing
+    description: Multi-gateway payment processing
+  - name: Rewards
+    description: Blockchain-based reward token system
+  - name: AI Assistant
+    description: RAG-powered conversational support

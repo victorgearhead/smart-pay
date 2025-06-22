@@ -1,0 +1,57 @@
+
+# Dependencies
+node_modules/
+package-lock.json*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# AWS
+.aws-sam/
+samconfig.toml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+*.lcov
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+ml_models/fraud_detection/creditcard.csv
+# ml_models/fraud_detection/fraud_model.joblib
+ml_models/routing_bandit/predict.py
+# ml_models/routing_bandit/quick_train_vw.py
+ml_models/routing_bandit/synthetic_dataset.py
+ml_models/routing_bandit/routing_synthetic.csv
