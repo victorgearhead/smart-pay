@@ -204,9 +204,3 @@ aws logs tail /aws/lambda/smartpay-fraud-function --follow
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-- **Documentation**: [docs/](docs/)
-- **Issues**: GitHub Issues
-- **Discord**: [SmartPay Community](https://discord.gg/smartpay)
-- **Email**: support@smartpay.dev
