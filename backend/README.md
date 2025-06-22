@@ -1,198 +1,246 @@
 
-# SmartPay Orchestrator Backend
+# SmartPay Orchestrator - Windows Local Deployment Guide
 
-A comprehensive payment orchestration platform with AI-powered fraud detection, smart routing, blockchain rewards, and conversational analytics.
-
-## 🏗️ Architecture
-
-- **API Layer**: AWS API Gateway + Lambda Functions
-- **Authentication**: AWS Cognito with JWT tokens
-- **ML Models**: AWS SageMaker endpoints for fraud detection and routing optimization
-- **Blockchain**: Solana integration for SPL token rewards
-- **Search & Chat**: OpenSearch + RAG pipeline with OpenAI/Bedrock
-- **Event-Driven**: EventBridge for decoupled workflows
-- **Infrastructure**: Terraform + AWS SAM for IaC
-
-## 🚀 Features
-
-### Core Services
-- **Fraud Detection**: XGBoost + Graph Neural Networks for real-time risk assessment
-- **Payment Routing**: Contextual bandits for optimal gateway selection (Stripe, AmazonPay, Solana)
-- **Blockchain Rewards**: Automated SPL token minting on Solana
-- **AI Assistant**: RAG-powered chat for payment analytics
-
-### API Endpoints
-- `POST /fraud` - Real-time fraud analysis
-- `POST /route` - Smart payment routing
-- `POST /pay` - Payment processing orchestration
-- `POST /reward` - Blockchain reward distribution
-- `POST /chat` - AI-powered analytics chat
-
-## 🛠️ Setup & Development
+## 🚀 Quick Start for Windows
 
 ### Prerequisites
-- Node.js 18+
-- AWS CLI configured
-- AWS SAM CLI
-- Docker (for local testing)
+- **Docker Desktop for Windows** (with WSL2 backend enabled)
+- **Node.js 18+** and **npm**
+- **Git for Windows**
+- **Windows Terminal** (recommended) or PowerShell
+- **curl** (available in Windows 10+ by default)
 
-### Environment Variables
-```bash
-AWS_REGION=us-east-1
-FRAUD_ENDPOINT_NAME=fraud-detection-endpoint
-ROUTING_ENDPOINT_NAME=routing-bandit-endpoint
+### 1. Setup and Start Services (Windows)
 
-STRIPE_SECRET_KEY=sk_test_...
-OPENAI_API_KEY=sk-...
-OPENSEARCH_ENDPOINT=https://search-...
+```powershell
+# Clone and navigate to backend
+cd backend
 
-SOLANA_RPC_URL=https://api.devnet.solana.com
-SPL_TOKEN_MINT_ADDRESS=...
-MINT_AUTHORITY_SECRET_KEY=...
-DEFAULT_USER_WALLET=...
-SOLANA_TREASURY_WALLET=...
+# Run the Windows setup script
+.\scripts\setup-windows.bat
 ```
 
-### Local Development
-```bash
+### 2. Manual Setup (if script fails)
+
+```powershell
+# Copy environment file
+copy .env.local .env
+
+# Install dependencies
 npm install
 
-npm test
+# Start Docker services
+docker-compose up -d
+
+# Wait for services (check manually)
+docker-compose ps
 
 npm run build
 
-sam local start-api --port 3001
-
-sam build && sam deploy --guided
+# Start the server
+npm run dev
 ```
 
-### Testing
+### 3. Configure API Keys (Optional for basic testing)
+
+Edit `.env` file and add your API keys:
+
 ```bash
-npm test
+# Required for real payment processing
+STRIPE_SECRET_KEY=sk_test_YOUR_STRIPE_TEST_KEY
+OPENAI_API_KEY=sk-YOUR_OPENAI_API_KEY
 
-npm run test:integration
-
-npm run test:load
-
-npm run test:coverage
+# Required for Solana rewards (generate with solana-keygen)
+MINT_AUTHORITY_SECRET_KEY=[1,2,3,4,5...] # Your keypair array
+SOLANA_PAYER_SECRET_KEY=[1,2,3,4,5...]   # Your keypair array
 ```
 
-## 📁 Project Structure
+### 4. Test the APIs (Windows)
 
-```
-backend/
-├── src/
-│   ├── handlers/          # Lambda function handlers
-│   ├── services/          # Business logic services
-│   ├── utils/            # Utility functions
-│   ├── types/            # TypeScript type definitions
-│   └── __tests__/        # Test files
-├── infra/                # Terraform infrastructure
-├── .github/workflows/    # CI/CD pipelines
-├── template.yaml         # AWS SAM template
-└── package.json         # Dependencies & scripts
+```powershell
+# Test all endpoints using Windows batch script
+.\scripts\test-apis.bat
 ```
 
-## 🔐 Security
+## 📊 Available Services
 
-- JWT authentication on all endpoints
-- AWS Cognito user management
-- Secrets stored in AWS Secrets Manager
-- TLS 1.3 for all communications
-- IAM least-privilege access
-- Input validation and sanitization
+### Backend API Endpoints
+- **Health Check**: `GET http://localhost:3001/health`
+- **Fraud Detection**: `POST http://localhost:3001/api/fraud`
+- **Payment Processing**: `POST http://localhost:3001/api/payment`
+- **Rewards Minting**: `POST http://localhost:3001/api/rewards`
+- **Chat/RAG**: `POST http://localhost:3001/api/chat`
 
-## 📊 Monitoring
+### ML Model Endpoints (Mock)
+- **Fraud Prediction**: `POST http://localhost:3001/ml/fraud/predict`
+- **Payment Routing**: `POST http://localhost:3001/ml/routing/predict`
 
-- CloudWatch Logs & Metrics
-- X-Ray distributed tracing
-- Custom dashboards for business metrics
-- Automated alerts for SLA breaches
-- Performance monitoring for ML models
+### Infrastructure Services
+- **OpenSearch**: `http://localhost:9200`
+- **OpenSearch Dashboards**: `http://localhost:5601`
+- **Redis**: `localhost:6379`
+- **LocalStack (AWS Mock)**: `http://localhost:4566`
 
-## 🚢 Deployment
+## 🤖 RAG (Retrieval Augmented Generation) Setup
 
-### CI/CD Pipeline
-- **Development**: Auto-deploy on `develop` branch
-- **Production**: Manual approval for `main` branch
-- **Testing**: Automated test suite on all PRs
-- **Infrastructure**: Terraform for AWS resources
+The RAG system is fully integrated and works with:
 
-### Environments
-- **dev**: Development environment
-- **staging**: Pre-production testing
-- **prod**: Production environment
+### Components:
+1. **OpenSearch** - Document storage and vector search
+2. **OpenAI GPT-3.5** - Language model for responses
+3. **Knowledge Base** - Indexed SmartPay documentation
+4. **Transaction History** - User-specific context
 
-## 🤖 ML Models
+### RAG Features:
+- **Contextual Responses** - AI assistant uses company knowledge
+- **Transaction Context** - Answers based on user's payment history
+- **Real-time Indexing** - New transactions are automatically indexed
+- **Semantic Search** - Finds relevant information using vector similarity
 
-### Fraud Detection
-- **XGBoost**: Gradient boosting for transaction features
-- **GraphSAGE**: Graph neural network for user behavior
-- **Ensemble**: Combined model scoring
-
-### Payment Routing
-- **Contextual Bandits**: Multi-armed bandit optimization
-- **Features**: Amount, risk, merchant type, region
-- **Rewards**: Success rate, cost optimization
-
-## 🔗 Blockchain Integration
-
-### Solana SPL Tokens
-- **Network**: Devnet (configurable)
-- **Rewards**: 2% of transaction amount
-- **Range**: 1-1000 tokens per transaction
-- **Wallet**: Phantom/Solflare support
-
-### Smart Contracts
-- Token minting program
-- Reward distribution logic
-- Meta-transaction support
-
-## 📈 Performance
-
-### SLA Targets
-- **Latency**: < 200ms p95
-- **Availability**: 99.9% uptime
-- **Error Rate**: < 0.1% 5xx errors
-- **ML Inference**: < 50ms fraud detection
-
-### Scaling
-- Auto-scaling Lambda functions
-- DynamoDB on-demand billing
-- ElastiCache for hot data
-- CDN for static assets
-
-## 🐛 Troubleshooting
-
-### Common Issues
-1. **SageMaker Timeout**: Check endpoint status and scaling
-2. **Cognito Auth**: Verify JWT token expiration
-3. **Solana RPC**: Network congestion or endpoint limits
-4. **OpenSearch**: Index refresh intervals
-
-### Debug Mode
-```bash
-export DEBUG=smartpay:*
-export LOG_LEVEL=debug
-
-aws logs tail /aws/lambda/smartpay-fraud-function --follow
+### Testing RAG:
+```powershell
+# Test the AI assistant endpoint
+curl -X POST http://localhost:3001/api/chat ^
+  -H "Content-Type: application/json" ^
+  -H "Authorization: Bearer mock-jwt-token" ^
+  -d "{\"message\":\"Why was my payment declined?\",\"userId\":\"user_123\",\"sessionId\":\"session_123\"}"
 ```
 
-## 🤝 Contributing
+## 🛠️ Windows-Specific Troubleshooting
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+### Docker Desktop Issues:
+```powershell
+# Restart Docker Desktop
+# Or via command line:
+& "C:\Program Files\Docker\Docker\Docker Desktop.exe" --quit
+Start-Sleep -Seconds 5
+& "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+```
 
-## 📝 License
+### Port Conflicts (Windows):
+```powershell
+# Find processes using ports
+netstat -ano | findstr "3001"
+netstat -ano | findstr "4566"
+netstat -ano | findstr "6379"
+netstat -ano | findstr "9200"
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# Kill process by PID (replace XXXX with actual PID)
+taskkill /PID XXXX /F
+```
 
-## 🆘 Support
+### WSL2 Issues:
+```powershell
+# Check WSL2 status
+wsl --status
 
-- **Documentation**: [docs/](docs/)
-- **Issues**: GitHub Issues
-- **Discord**: [SmartPay Community](https://discord.gg/smartpay)
-- **Email**: support@smartpay.dev
+# Restart WSL2 if needed
+wsl --shutdown
+wsl
+```
+
+### Reset Everything (Windows):
+```powershell
+# Stop and remove all containers and volumes
+docker-compose down -v
+docker system prune -f
+.\scripts\setup-windows.bat
+```
+
+### Environment Variable Issues:
+```powershell
+# Check if environment variables are loaded
+Get-Content .env
+```
+
+## 🧪 Complete Testing Workflow (Windows)
+
+### 1. Health Check:
+```powershell
+curl http://localhost:3001/health
+```
+
+### 2. Infrastructure Check:
+```powershell
+# Redis
+docker exec redis-smartpay redis-cli ping
+
+# OpenSearch
+curl http://localhost:9200/_cluster/health
+
+# LocalStack
+curl http://localhost:4566/health
+```
+
+### 3. API Testing:
+```powershell
+# Run all tests
+.\scripts\test-apis.bat
+```
+
+### 4. RAG Testing:
+```powershell
+# Check OpenSearch indices
+curl http://localhost:9200/_cat/indices
+
+# Test knowledge search
+curl -X POST http://localhost:9200/smartpay-knowledge/_search ^
+  -H "Content-Type: application/json" ^
+  -d "{\"query\":{\"match_all\":{}}}"
+```
+
+## 📈 Frontend Integration (Windows)
+
+### Start Frontend:
+```powershell
+# In project root directory
+npm install
+npm run dev
+```
+
+### Access Application:
+- **Frontend**: `http://localhost:8080` (or your Vite port)
+- **Backend**: `http://localhost:3001`
+
+## 🚀 Production Deployment Notes
+
+### What Works Locally:
+✅ **Mock ML Models** - XGBoost, Vowpal Wabbit, GNN, Anomaly Detection  
+✅ **Mock Payment Gateways** - Stripe, Amazon Pay, Solana  
+✅ **RAG System** - OpenSearch + OpenAI integration  
+✅ **Real-time Updates** - WebSocket connections  
+✅ **Caching Layer** - Redis for performance  
+✅ **Event Processing** - LocalStack EventBridge  
+
+### For Production (requires real services):
+🔄 **Real AWS SageMaker** - Deploy actual ML models  
+🔄 **Real Payment APIs** - Live Stripe, Amazon Pay keys  
+🔄 **Production OpenSearch** - AWS OpenSearch Service  
+🔄 **Solana Mainnet** - Real blockchain transactions  
+
+## 🆘 Support & Debugging
+
+### Logs and Monitoring:
+```powershell
+# Backend logs
+npm run dev
+
+# Docker service logs
+docker-compose logs redis
+docker-compose logs opensearch
+docker-compose logs localstack
+
+# Check all services
+docker-compose ps
+```
+
+### Debug Mode:
+Set `DEBUG=1` in `.env` for verbose logging.
+
+### Common Windows Issues:
+1. **Path Issues** - Use forward slashes or double backslashes
+2. **Permission Issues** - Run PowerShell as Administrator
+3. **Firewall Issues** - Allow Docker and Node.js through Windows Firewall
+4. **Antivirus Issues** - Exclude project folder from real-time scanning
+
+This setup provides a complete SmartPay development environment on Windows with full RAG capabilities and all services working locally! 🎉
