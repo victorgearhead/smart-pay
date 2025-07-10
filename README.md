@@ -88,40 +88,6 @@ npm run test:load
 # Coverage report
 npm run test:coverage
 ```
-
-## 📁 Project Structure
-
-```
-backend/
-├── src/
-│   ├── handlers/          # Lambda function handlers
-│   ├── services/          # Business logic services
-│   ├── utils/            # Utility functions
-│   ├── types/            # TypeScript type definitions
-│   └── __tests__/        # Test files
-├── infra/                # Terraform infrastructure
-├── .github/workflows/    # CI/CD pipelines
-├── template.yaml         # AWS SAM template
-└── package.json         # Dependencies & scripts
-```
-
-## 🔐 Security
-
-- JWT authentication on all endpoints
-- AWS Cognito user management
-- Secrets stored in AWS Secrets Manager
-- TLS 1.3 for all communications
-- IAM least-privilege access
-- Input validation and sanitization
-
-## 📊 Monitoring
-
-- CloudWatch Logs & Metrics
-- X-Ray distributed tracing
-- Custom dashboards for business metrics
-- Automated alerts for SLA breaches
-- Performance monitoring for ML models
-
 ## 🚢 Deployment
 
 ### CI/CD Pipeline
@@ -139,34 +105,11 @@ backend/
 
 ### Fraud Detection
 - **XGBoost**: Gradient boosting for transaction features
-- **GraphSAGE**: Graph neural network for user behavior
-- **Ensemble**: Combined model scoring
 
 ### Payment Routing
 - **Contextual Bandits**: Multi-armed bandit optimization
 - **Features**: Amount, risk, merchant type, region
 - **Rewards**: Success rate, cost optimization
-
-## 🔗 Blockchain Integration
-
-### Solana SPL Tokens
-- **Network**: Devnet (configurable)
-- **Rewards**: 2% of transaction amount
-- **Range**: 1-1000 tokens per transaction
-- **Wallet**: Phantom/Solflare support
-
-### Smart Contracts
-- Token minting program
-- Reward distribution logic
-- Meta-transaction support
-
-## 📈 Performance
-
-### SLA Targets
-- **Latency**: < 200ms p95
-- **Availability**: 99.9% uptime
-- **Error Rate**: < 0.1% 5xx errors
-- **ML Inference**: < 50ms fraud detection
 
 ### Scaling
 - Auto-scaling Lambda functions
@@ -181,26 +124,4 @@ backend/
 2. **Cognito Auth**: Verify JWT token expiration
 3. **Solana RPC**: Network congestion or endpoint limits
 4. **OpenSearch**: Index refresh intervals
-
-### Debug Mode
-```bash
-# Enable detailed logging
-export DEBUG=smartpay:*
-export LOG_LEVEL=debug
-
-# Check CloudWatch logs
-aws logs tail /aws/lambda/smartpay-fraud-function --follow
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
